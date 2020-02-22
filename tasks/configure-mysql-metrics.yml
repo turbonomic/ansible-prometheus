@@ -1,0 +1,30 @@
+---
+- name: 'open prometheus mysql_exporter port'
+  firewalld:
+    port: "{{ mysqld_exporter_port }}/tcp"
+    permanent: true
+    state: enabled
+  notify: restart firewall
+
+- name: 'update mysql long_query_time to half a second'
+  mysql_variables:
+    variable: long_query_time
+    value: 0.5
+    login_user: "{{ mysql_user }}"
+    login_password: "{{ mysql_password }}"
+
+- name: 'create mysql_exporter db user'
+  mysql_user:
+    name: "{{ mysqld_exporter_user }}"
+    password: "{{ mysqld_exporter_password }}"
+    priv: '*.*:PROCESS,REPLICATION CLIENT,SELECT'
+    login_user: "{{ mysql_user }}"
+    login_password: "{{ mysql_password }}"
+    state: present
+  tags:
+    - mysql_exporter
+
+- name: 'set mysql_exporter db user max connections'
+  command: "/usr/bin/mysql -u {{ mysql_user }} -p{{ mysql_password }} --execute=\"GRANT PROCESS, REPLICATION CLIENT,SELECT ON *.* TO 'exporter'@'localhost' WITH MAX_USER_CONNECTIONS 3\""
+  tags:
+  - mysql_exporter

@@ -1,0 +1,4 @@
+---
+# set the friendly hostname from the playbook variable
+- name: set hostname
+  hostname: name="{{ inventory_hostname }}"

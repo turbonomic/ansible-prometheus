@@ -1,0 +1,50 @@
+---
+# This user is created on the remote hosts to execute the installations.  You must specify the
+# authorized key (auth_key) for remote hosts to allow SSH access.
+users:
+- username: ansible
+  groups: ['admin', 'sudoers']
+  auth_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  root_login: true
+
+groups_to_create: ['admin']
+
+# Node exporter configuration -
+# Uncomment to customize the node exporter version
+#node_exporter_version: 0.18.1
+node_exporter_port: 9100
+node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
+node_exporter_enabled_collectors: [ systemd ]
+node_exporter_disabled_collectors: []
+
+# MySQL exporter configuration
+# Uncomment to customize the mysqld exporter version; default is the latest from cloudalchemy
+#mysqld_exporter_version: 0.12.1
+mysqld_exporter_port: 9104
+mysqld_exporter_user: exporter
+mysqld_exporter_password: password
+mysqld_exporter_web_listen_address: "0.0.0.0:{{ mysqld_exporter_port }}"
+mysqld_exporter_dsn: "{{ mysqld_exporter_user }}:{{ mysqld_exporter_password }}@(localhost:3306)/"
+
+# MySQL server credentials - used to create the above mysqld_exporter_user; please fill in
+mysql_user: MYSQL_USER
+mysql_password: MYSQL_PASSWORD
+
+# Prometheus target configuration - please configure
+# This will be auto-populated in the future, but please specify in the time being
+prometheus_scrape_configs:
+- job_name: node-exporters
+  static_configs:
+    - targets:
+      - "HOST1:{{ node_exporter_port }}"
+      - "HOST2:{{ node_exporter_port }}"
+- job_name: mysql-exporters
+  static_configs:
+    - targets:
+      - "MYSQL_HOST1:{{ mysqld_exporter_port }}"
+      - "MYSQL_HOST2:{{ mysqld_exporter_port }}"
+- job_name: jmx-exporters
+  static_configs:
+    - targets:
+        - 'TOMCAT_HOST1:9101'
+        - 'TOMCAT_HOST2:9101'

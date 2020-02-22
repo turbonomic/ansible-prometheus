@@ -1,0 +1,11 @@
+[prometheus_servers]
+# prometheus.demo.company.com ansible_host=1.2.3.100 ansible_user=root ansible_ssh_pass=password
+
+[tomcat_servers]
+# app1.demo.company.com ansible_host=1.2.3.1 ansible_user=app ansible_ssh_private_key_file=app.pem
+# app2.demo.company.com ansible_host=1.2.3.2 ansible_user=app ansible_ssh_private_key_file=app.pem
+# app3.demo.company.com ansible_host=1.2.3.3 ansible_user=app ansible_ssh_private_key_file=app.pem
+
+[mysql_servers]
+# db1.demo.company.com ansible_host=1.2.3.11 ansible_user=db ansible_ssh_private_key_file=db.pem
+# db2.demo.company.com ansible_host=1.2.3.12 ansible_user=db ansible_ssh_private_key_file=db.pem

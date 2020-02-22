@@ -1,0 +1,10 @@
+---
+
+- name: Enable OpsMgr Metrics exporter
+  copy:
+    src: files/tomcat/conf.d/metrics-exporter.conf
+    dest: /etc/tomcat/conf.d/metrics-exporter.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart tomcat

@@ -1,0 +1,7 @@
+---
+- name: 'open prometheus node_exporter port'
+  firewalld:
+    port: 9100/tcp
+    permanent: true
+    state: enabled
+  notify: restart firewall

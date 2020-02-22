@@ -1,0 +1,55 @@
+---
+- hosts: all
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars_files:
+  - vars/main.yml
+  handlers:
+  - include: handlers/main.yml
+  pre_tasks:
+  - include: tasks/users.yml
+  - include: tasks/update-root-login.yml
+  - include: tasks/install-dev-tools.yml
+  - include: tasks/hostname.yml
+  - include: tasks/configure-node-exporter.yml
+  roles:
+  - { role: cloudalchemy.node-exporter, become_user: root, become: true }
+
+- hosts: tomcat_servers
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars_files:
+  - vars/main.yml
+  handlers:
+  - include: handlers/main.yml
+  pre_tasks:
+  - include: tasks/jmx-exporter-tomcat.yml
+  - include: tasks/metrics-exporter.yml
+
+- hosts: mysql_servers
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars_files:
+    - vars/main.yml
+  handlers:
+    - include: handlers/main.yml
+  pre_tasks:
+    - include: tasks/configure-mysql-metrics.yml
+  roles:
+    - { role: cloudalchemy.mysqld_exporter, become_user: root, become: true, tags: [mysql_exporter] }
+
+- hosts: prometheus_servers
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars_files:
+    - vars/main.yml
+  handlers:
+    - include: handlers/main.yml
+  pre_tasks:
+    - include: tasks/firewall-prometheus.yml
+  roles:
+    - { role: cloudalchemy.prometheus, become_user: root, become: true }

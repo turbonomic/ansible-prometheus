@@ -1,0 +1,21 @@
+---
+
+- name: 'install dev tools'
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - epel-release
+    - python-pip
+    - python-wheel
+    - rsync
+    - net-tools
+    - iotop
+    - python-devel
+    - mysql-devel
+    - gcc
+
+- name: 'install mysqlclient'
+  pip:
+    name: mysqlclient
+    state: present

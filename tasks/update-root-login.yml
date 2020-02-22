@@ -1,0 +1,12 @@
+---
+- name: Add public SSH keys to root
+  authorized_key:
+    user: root
+    path: /root/.ssh/authorized_keys
+    state: present
+    key: "{{ item.auth_key }}"
+  when: item.root_login
+  with_items: "{{ users }}"
+  tags: ['users','configuration']
+  become_user: root
+  become: true

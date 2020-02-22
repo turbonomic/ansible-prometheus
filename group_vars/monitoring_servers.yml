@@ -1,0 +1,48 @@
+---
+
+prometheus_version: 2.3.2
+prometheus_web_listen_address: "0.0.0.0:9090"
+prometheus_storage_retention: "30d"
+prometheus_global:
+  scrape_interval: 60s
+  scrape_timeout: 30s
+  evaluation_interval: 1m
+
+prometheus_scrape_configs:
+- job_name: prometheus-exporters
+  relabel_configs:
+  - source_labels: ['__meta_prometheus_service']
+    regex:         'prometheus-(.*)-exporter'
+    target_label:  'job'
+    replacement:   '$1'
+  - source_labels: ['__meta_prometheus_node']
+    regex:         '(.*)'
+    target_label:  'node'
+    replacement:   '$1'
+
+grafana_port: 3000
+grafana_url: "https://{{ grafana_address }}:{{ grafana_port }}"
+grafana_api_url: "{{ grafana_url }}"
+
+grafana_server:
+  protocol: https
+  cert_file: "/etc/pki/tls/certs/localhost.crt"
+  cert_key: "/etc/pki/tls/private/localhost.key"
+
+grafana_security:
+  admin_user: admin
+  admin_password: 'grafana'
+
+grafana_auth:
+  anonymous:
+    org_name: Turbonomic
+    org_role: Viewer
+    enabled: true
+
+grafana_datasources:
+- name: prometheus
+  type: prometheus
+  access: proxy
+  url: 'http://localhost:9090'
+  basicAuth: false
+  isDefault: true

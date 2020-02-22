@@ -1,0 +1,60 @@
+---
+
+- name: Creating groups
+  group: name="{{ item }}"
+  with_items: "{{ groups_to_create }}"
+  when: groups_to_create | length > 0
+  tags: ['groups','configuration']
+  become_user: root
+  become: true
+
+- name: Creating 'sudoers' group
+  group: name="sudoers"
+  tags: ['groups','configuration']
+  become_user: root
+  become: true
+
+- name: Allow 'sudoers' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudoers'
+    line: '%sudoers ALL=(ALL) NOPASSWD: ALL'
+    validate: visudo -cf %s
+  tags: ['configuration']
+  become_user: root
+  become: true
+
+- name: Per-user group creation
+  group: name="{{item.username}}"
+    gid="{{item.gid | default(item.uid) | default(omit)}}"
+  with_items: "{{users}}"
+  when: "'group' not in item"
+  tags: ['users','configuration']
+  become_user: root
+  become: true
+
+- name: Add users
+  user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    append: true
+    createhome: true
+    group: "{{ item.group | default(item.username) }}"
+    groups: "{{ item.groups | join(',') if 'groups' in item else '' }}"
+  with_items: "{{ users }}"
+  when: users | length > 0
+  tags: ['users','configuration']
+  become_user: root
+  become: true
+
+- name: Add public SSH keys
+  authorized_key:
+    user: "{{ item.username }}"
+    state: present
+    key: "{{ item.auth_key }}"
+  with_items: "{{ users }}"
+  tags: ['users','configuration']
+  when: users | length > 0
+  become_user: root
+  become: true

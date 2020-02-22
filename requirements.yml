@@ -1,0 +1,4 @@
+- src: cloudalchemy.prometheus
+- src: cloudalchemy.node-exporter
+- src: cloudalchemy.mysqld_exporter
+- src: cloudalchemy.grafana

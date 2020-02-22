@@ -1,0 +1,34 @@
+---
+
+- name: Install jmx_exporter
+  copy:
+    src: jmx_exporter
+    dest: /srv/
+    directory_mode: true
+    owner: "root"
+    group: "root"
+    mode: 0755
+
+- name: Open jmx_exporter port
+  firewalld:
+    port: 9101/tcp
+    permanent: true
+    state: enabled
+  notify: restart firewall
+
+- name: Allow tomcat to listen on tcp port 9101
+  seport:
+    ports: 9101
+    proto: tcp
+    setype: http_cache_port_t
+    state: present
+  ignore_errors: yes
+
+- name: Add jmx_exporter agent to tomcat
+  copy:
+    src: tomcat/conf.d/jmx-exporter.conf
+    dest: /etc/tomcat/conf.d/jmx-exporter.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart tomcat
