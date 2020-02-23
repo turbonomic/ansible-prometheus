@@ -1,7 +1,7 @@
 # ansible-prometheus
 
-This project combines playbooks from various sources including [cloudalchemy](https://github.com
-/cloudalchemy) to provision one or all of the following services:
+This project combines playbooks from various sources including 
+[cloudalchemy](https://github.com/cloudalchemy) to provision one or all of the following services:
 * Prometheus server
 * Node exporter
 * MySQL exporter
